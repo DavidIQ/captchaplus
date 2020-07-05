@@ -133,8 +133,7 @@ class main_listener implements EventSubscriberInterface
             return;
         }
 
-        $mode = $event['mode'];
-        if ($this->captcha->is_solved() === true && ($mode == 'post' || $mode == 'reply' || $mode == 'quote'))
+        if ($this->captcha->is_solved() === true)
         {
             $this->captcha->reset();
         }
@@ -152,9 +151,12 @@ class main_listener implements EventSubscriberInterface
             return;
         }
 
-        $mode = $event['mode'];
-        if ($this->captcha->is_solved() === false && ($mode == 'post' || $mode == 'reply' || $mode == 'quote'))
+        if ($this->captcha->is_solved() === false)
         {
+            $s_hidden_fields = $event['s_hidden_fields'];
+            $s_hidden_fields .= build_hidden_fields($this->captcha->get_hidden_fields());
+            $event['s_hidden_fields'] = $s_hidden_fields;
+
             $page_data = $event['page_data'];
             $page_data['CAPTCHA4POST_TEMPLATE'] = $this->captcha->get_template();
             $event['page_data'] = $page_data;
