@@ -1,8 +1,8 @@
 {
-    "name": "davidiq/captcha4post",
+    "name": "davidiq/captchaplus",
     "type": "phpbb-extension",
-    "description": "Enforces solving of a CAPTCHA when posting",
-    "homepage": "https://github.com/DavidIQ/captcha4post",
+    "description": "Adds CAPTCHA to more areas.",
+    "homepage": "https://github.com/DavidIQ/captchaplus",
     "version": "1.0.0",
     "time": "2020-07-04",
     "license": "GPL-2.0-only",

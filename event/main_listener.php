@@ -8,7 +8,7 @@
  *
  */
 
-namespace davidiq\captcha4post\event;
+namespace davidiq\captchaplus\event;
 
 /**
  * @ignore
@@ -25,10 +25,10 @@ class main_listener implements EventSubscriberInterface
     {
         return [
             'core.permissions' => 'add_permissions',
-            'core.modify_posting_auth' => 'init_captcha4post',
-            'core.posting_modify_message_text' => 'validate_captcha4post',
+            'core.modify_posting_auth' => 'init_captchaplus',
+            'core.posting_modify_message_text' => 'validate_captchaplus',
             'core.posting_modify_submit_post_after' => 'after_submit_check',
-            'core.posting_modify_template_vars' => 'add_captcha4post',
+            'core.posting_modify_template_vars' => 'add_captchaplus',
         ];
     }
 
@@ -68,7 +68,7 @@ class main_listener implements EventSubscriberInterface
     public function add_permissions($event)
     {
         $permissions = $event['permissions'];
-        $permissions['f_nocaptcha4post'] = ['lang' => 'ACL_F_NOCAPTCHA4POST', 'cat' => 'post'];
+        $permissions['f_nopostcaptcha'] = ['lang' => 'ACL_F_NOPOSTCAPTCHA', 'cat' => 'post'];
         $event['permissions'] = $permissions;
     }
 
@@ -77,10 +77,10 @@ class main_listener implements EventSubscriberInterface
      *
      * @param \phpbb\event\data $event Event object
      */
-    public function init_captcha4post($event)
+    public function init_captchaplus($event)
     {
         $forum_id = (int)$event['forum_id'];
-        $can_post_without_captcha = $this->auth->acl_get('f_nocaptcha4post', $forum_id);
+        $can_post_without_captcha = $this->auth->acl_get('f_nopostcaptcha', $forum_id);
         if (!$can_post_without_captcha && !empty($this->config['captcha_plugin']))
         {
             $this->captcha = $this->captcha_factory->get_instance($this->config['captcha_plugin']);
@@ -93,7 +93,7 @@ class main_listener implements EventSubscriberInterface
      *
      * @param \phpbb\event\data $event Event object
      */
-    public function validate_captcha4post($event)
+    public function validate_captchaplus($event)
     {
         if (!isset($this->captcha))
         {
@@ -144,7 +144,7 @@ class main_listener implements EventSubscriberInterface
      *
      * @param \phpbb\event\data $event Event object
      */
-    public function add_captcha4post($event)
+    public function add_captchaplus($event)
     {
         if (!isset($this->captcha))
         {
@@ -158,7 +158,7 @@ class main_listener implements EventSubscriberInterface
             $event['s_hidden_fields'] = $s_hidden_fields;
 
             $page_data = $event['page_data'];
-            $page_data['CAPTCHA4POST_TEMPLATE'] = $this->captcha->get_template();
+            $page_data['CAPTCHAPLUS_TEMPLATE'] = $this->captcha->get_template();
             $event['page_data'] = $page_data;
         }
     }

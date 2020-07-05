@@ -2,7 +2,7 @@
 
 ## Installation
 
-Copy the extension to phpBB/ext/davidiq/captcha4post
+Copy the extension to phpBB/ext/davidiq/captchaplus
 
 Go to "ACP" > "Customise" > "Extensions" and enable the "CAPTCHA 4 post" extension.
 
@@ -13,11 +13,11 @@ To run the tests locally, you need to install phpBB from its Git repository. Aft
 
 Windows:
 
-    phpBB\vendor\bin\phpunit.bat -c phpBB\ext\davidiq\captcha4post\phpunit.xml.dist
+    phpBB\vendor\bin\phpunit.bat -c phpBB\ext\davidiq\captchaplus\phpunit.xml.dist
 
 others:
 
-    phpBB/vendor/bin/phpunit -c phpBB/ext/davidiq/captcha4post/phpunit.xml.dist
+    phpBB/vendor/bin/phpunit -c phpBB/ext/davidiq/captchaplus/phpunit.xml.dist
 
 ## License
 

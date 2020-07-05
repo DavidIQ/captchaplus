@@ -8,7 +8,7 @@
  *
  */
 
-namespace davidiq\captcha4post\migrations;
+namespace davidiq\captchaplus\migrations;
 
 class install_permissions extends \phpbb\db\migration\migration
 {
@@ -26,7 +26,7 @@ class install_permissions extends \phpbb\db\migration\migration
     {
         return [
             // Add new permissions
-            ['permission.add', ['f_nocaptcha4post', false, 'f_noapprove']], // Copy settings from "Can post without approval"
+            ['permission.add', ['f_nopostcaptcha', false, 'f_noapprove']], // Copy settings from "Can post without approval"
         ];
     }
 
@@ -38,7 +38,7 @@ class install_permissions extends \phpbb\db\migration\migration
     public function revert_data()
     {
         return [
-            ['permission.remove', ['f_nocaptcha4post']]
+            ['permission.remove', ['f_nopostcaptcha']]
         ];
     }
 }

@@ -1,6 +1,6 @@
 services:
-    davidiq.captcha4post.listener:
-        class: davidiq\captcha4post\event\main_listener
+    davidiq.captchaplus.listener:
+        class: davidiq\captchaplus\event\main_listener
         arguments:
             - '@user'
             - '@auth'

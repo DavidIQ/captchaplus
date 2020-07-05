@@ -8,7 +8,7 @@
  *
  */
 
-namespace davidiq\captcha4post\tests\dbal;
+namespace davidiq\captchaplus\tests\dbal;
 
 
 class simple_test extends \phpbb_database_test_case
@@ -18,7 +18,7 @@ class simple_test extends \phpbb_database_test_case
 	 */
 	protected static function setup_extensions()
 	{
-		return ['davidiq/captcha4post'];
+		return ['davidiq/captchaplus'];
 	}
 
 	/** @var \phpbb\db\driver\driver_interface */
@@ -51,7 +51,7 @@ class simple_test extends \phpbb_database_test_case
 			$db_tools = $factory->get($this->db);
 		}
 
-		$this->assertTrue($db_tools->sql_column_exists(USERS_TABLE, 'user_captcha4post'), 'Asserting that column "user_captcha4post" exists');
-		$this->assertFalse($db_tools->sql_column_exists(USERS_TABLE, 'user_captcha4post_void'), 'Asserting that column "user_captcha4post_void" does not exist');
+		$this->assertTrue($db_tools->sql_column_exists(USERS_TABLE, 'user_captchaplus'), 'Asserting that column "user_captchaplus" exists');
+		$this->assertFalse($db_tools->sql_column_exists(USERS_TABLE, 'user_captchaplus_void'), 'Asserting that column "user_captchaplus_void" does not exist');
 	}
 }

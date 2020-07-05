@@ -8,7 +8,7 @@
  *
  */
 
-namespace davidiq\captcha4post\tests\controller;
+namespace davidiq\captchaplus\tests\controller;
 
 class main_test extends \phpbb_test_case
 {
@@ -18,7 +18,7 @@ class main_test extends \phpbb_test_case
 	public function handle_data()
 	{
 		return [
-			[200, 'captcha4post_body.html'],
+			[200, 'captchaplus_body.html'],
 		];
 	}
 
@@ -62,7 +62,7 @@ class main_test extends \phpbb_test_case
 			});
 
 		// Instantiate the controller
-		$controller = new \davidiq\captcha4post\controller\main_controller(
+		$controller = new \davidiq\captchaplus\controller\main_controller(
 			new \phpbb\config\config([]),
 			$controller_helper,
 			$template,
