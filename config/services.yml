@@ -1,10 +1,15 @@
 services:
-    davidiq.captchaplus.listener:
-        class: davidiq\captchaplus\event\main_listener
+    davidiq.captchaplus.service:
+        class: davidiq\captchaplus\service
         arguments:
             - '@user'
             - '@auth'
             - '@config'
             - '@captcha.factory'
+
+    davidiq.captchaplus.listener:
+        class: davidiq\captchaplus\event\main_listener
+        arguments:
+            - '@davidiq.captchaplus.service'
         tags:
             - { name: event.listener }

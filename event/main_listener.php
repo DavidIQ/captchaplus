@@ -26,38 +26,26 @@ class main_listener implements EventSubscriberInterface
         return [
             'core.permissions' => 'add_permissions',
             'core.modify_posting_auth' => 'init_captchaplus',
+            'core.viewtopic_modify_quick_reply_template_vars' => 'init_captchaplus_qr',
             'core.posting_modify_message_text' => 'validate_captchaplus',
             'core.posting_modify_submit_post_after' => 'after_submit_check',
             'core.posting_modify_template_vars' => 'add_captchaplus',
         ];
     }
 
-    /** @var \phpbb\user */
-    protected $user;
-
-    /** @var \phpbb\auth\auth */
-    protected $auth;
-
-    /** @var /phpbb/config/config */
-    protected $config;
-
-    /** @var \phpbb\captcha\factory */
-    protected $captcha_factory;
+    /** @var \davidiq\captchaplus\service */
+    private $captchaplus_service;
 
     /** @var \phpbb\captcha\plugins\captcha_abstract */
     private $captcha;
 
     /**
      * Constructor
-     *
-     * @param \phpbb\user $user User object
+     * @param \davidiq\captchaplus\service $service CAPTCHA+ service
      */
-    public function __construct(\phpbb\user $user, \phpbb\auth\auth $auth, \phpbb\config\config $config, \phpbb\captcha\factory $captcha_factory)
+    public function __construct(\davidiq\captchaplus\service $service)
     {
-        $this->user = $user;
-        $this->auth = $auth;
-        $this->config = $config;
-        $this->captcha_factory = $captcha_factory;
+        $this->captchaplus_service = $service;
     }
 
     /**
@@ -80,11 +68,24 @@ class main_listener implements EventSubscriberInterface
     public function init_captchaplus($event)
     {
         $forum_id = (int)$event['forum_id'];
-        $can_post_without_captcha = $this->auth->acl_get('f_nopostcaptcha', $forum_id);
-        if (!$can_post_without_captcha && !empty($this->config['captcha_plugin']))
+        $this->captcha = $this->captchaplus_service->init($forum_id);
+    }
+
+    /**
+     * Adds CAPTCHA to Quick Reply form
+     *
+     * @param $event
+     */
+    public function init_captchaplus_qr($event)
+    {
+        $topic_data = $event['topic_data'];
+        $captcha = $this->captchaplus_service->init($topic_data['forum_id']);
+        $tpl_ary = $event['tpl_ary'];
+        $qr_hidden_fields = $tpl_ary['QR_HIDDEN_FIELDS'];
+        if ($this->captchaplus_service->add_captcha_template($captcha, $qr_hidden_fields, $tpl_ary))
         {
-            $this->captcha = $this->captcha_factory->get_instance($this->config['captcha_plugin']);
-            $this->captcha->init(CONFIRM_POST);
+            $tpl_ary['QR_HIDDEN_FIELDS'] = $qr_hidden_fields;
+            $event['tpl_ary'] = $tpl_ary;
         }
     }
 
@@ -95,25 +96,10 @@ class main_listener implements EventSubscriberInterface
      */
     public function validate_captchaplus($event)
     {
-        if (!isset($this->captcha))
-        {
-            return;
-        }
-
         $message_parser = $event['message_parser'];
-        $message = $message_parser->message;
-
         $post_data = $event['post_data'];
-        $subject = $post_data['post_subject'];
-        $username = $post_data['username'];
-
-        $captcha_data = array(
-            'message' => $message,
-            'subject' => $subject,
-            'username' => $username,
-        );
-        $vc_response = $this->captcha->validate($captcha_data);
-        if ($vc_response)
+        $vc_response = $this->captchaplus_service->validate($this->captcha, $message_parser->message, $post_data['post_subject'], $post_data['username']);
+        if (!empty($vc_response))
         {
             $error = $event['error'];
             $error[] = $vc_response;
@@ -128,15 +114,7 @@ class main_listener implements EventSubscriberInterface
      */
     public function after_submit_check($event)
     {
-        if (!isset($this->captcha))
-        {
-            return;
-        }
-
-        if ($this->captcha->is_solved() === true)
-        {
-            $this->captcha->reset();
-        }
+        $this->captchaplus_service->reset($this->captcha);
     }
 
     /**
@@ -146,19 +124,11 @@ class main_listener implements EventSubscriberInterface
      */
     public function add_captchaplus($event)
     {
-        if (!isset($this->captcha))
+        $s_hidden_fields = $event['s_hidden_fields'];
+        $page_data = $event['page_data'];
+        if ($this->captchaplus_service->add_captcha_template($this->captcha, $s_hidden_fields, $page_data))
         {
-            return;
-        }
-
-        if ($this->captcha->is_solved() === false)
-        {
-            $s_hidden_fields = $event['s_hidden_fields'];
-            $s_hidden_fields .= build_hidden_fields($this->captcha->get_hidden_fields());
             $event['s_hidden_fields'] = $s_hidden_fields;
-
-            $page_data = $event['page_data'];
-            $page_data['CAPTCHAPLUS_TEMPLATE'] = $this->captcha->get_template();
             $event['page_data'] = $page_data;
         }
     }

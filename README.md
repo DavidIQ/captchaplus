@@ -1,4 +1,4 @@
-# CAPTCHA 4 post
+# CAPTCHA+
 
 ## Installation
 

@@ -19,7 +19,7 @@
         "composer/installers": "~1.0"
     },
     "extra": {
-        "display-name": "CAPTCHA 4 post",
+        "display-name": "CAPTCHA+",
         "soft-require": {
             "phpbb/phpbb": ">=3.3.0,<3.4.0@dev"
         }
