@@ -1,0 +1,10 @@
+services:
+    davidiq.captcha4post.listener:
+        class: davidiq\captcha4post\event\main_listener
+        arguments:
+            - '@user'
+            - '@auth'
+            - '@config'
+            - '@captcha.factory'
+        tags:
+            - { name: event.listener }
