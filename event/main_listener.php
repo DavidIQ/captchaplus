@@ -25,22 +25,27 @@ class main_listener implements EventSubscriberInterface
     {
         return [
             'core.permissions' => 'add_permissions',
-            'core.modify_posting_auth' => 'init_captchaplus',
+            'core.modify_posting_auth' => 'init_captchaplus_post',
             'core.viewtopic_modify_quick_reply_template_vars' => 'init_captchaplus_qr',
+            'core.ucp_pm_compose_modify_data' => 'init_captchaplus_pm',
             'core.posting_modify_message_text' => 'validate_captchaplus',
+            'core.ucp_pm_compose_modify_parse_before' => 'validate_captchaplus',
             'core.posting_modify_submit_post_after' => 'after_submit_check',
+            'core.ucp_pm_compose_modify_parse_after' => 'after_submit_check_pm',
             'core.posting_modify_template_vars' => 'add_captchaplus',
+            'core.ucp_pm_compose_template' => 'add_captchaplus_pm',
         ];
     }
 
     /** @var \davidiq\captchaplus\service */
-    private $captchaplus_service;
+    protected $captchaplus_service;
 
     /** @var \phpbb\captcha\plugins\captcha_abstract */
-    private $captcha;
+    protected $captcha;
 
     /**
      * Constructor
+     *
      * @param \davidiq\captchaplus\service $service CAPTCHA+ service
      */
     public function __construct(\davidiq\captchaplus\service $service)
@@ -57,6 +62,7 @@ class main_listener implements EventSubscriberInterface
     {
         $permissions = $event['permissions'];
         $permissions['f_nopostcaptcha'] = ['lang' => 'ACL_F_NOPOSTCAPTCHA', 'cat' => 'post'];
+        $permissions['u_nopmcaptcha'] = ['lang' => 'ACL_U_NOPMCAPTCHA', 'cat' => 'pm'];
         $event['permissions'] = $permissions;
     }
 
@@ -65,21 +71,23 @@ class main_listener implements EventSubscriberInterface
      *
      * @param \phpbb\event\data $event Event object
      */
-    public function init_captchaplus($event)
+    public function init_captchaplus_post($event)
     {
         $forum_id = (int)$event['forum_id'];
-        $this->captcha = $this->captchaplus_service->init($forum_id);
+        $can_post_without_captcha = $this->captchaplus_service->can_post_without_captcha($forum_id);
+        $this->captcha = $this->captchaplus_service->init($can_post_without_captcha);
     }
 
     /**
      * Adds CAPTCHA to Quick Reply form
      *
-     * @param $event
+     * @param \phpbb\event\data $event Event object
      */
     public function init_captchaplus_qr($event)
     {
         $topic_data = $event['topic_data'];
-        $captcha = $this->captchaplus_service->init($topic_data['forum_id']);
+        $can_post_without_captcha = $this->captchaplus_service->can_post_without_captcha($topic_data['forum_id']);
+        $captcha = $this->captchaplus_service->init($can_post_without_captcha);
         $tpl_ary = $event['tpl_ary'];
         $qr_hidden_fields = $tpl_ary['QR_HIDDEN_FIELDS'];
         if ($this->captchaplus_service->add_captcha_template($captcha, $qr_hidden_fields, $tpl_ary))
@@ -90,6 +98,17 @@ class main_listener implements EventSubscriberInterface
     }
 
     /**
+     * Adds CAPTCHA to PM
+     *
+     * @param \phpbb\event\data $event Event object
+     */
+    public function init_captchaplus_pm($event)
+    {
+        $can_pm_without_captcha = $this->captchaplus_service->can_pm_without_captcha();
+        $this->captcha = $this->captchaplus_service->init($can_pm_without_captcha);
+    }
+
+    /**
      * Validates the CAPTCHA
      *
      * @param \phpbb\event\data $event Event object
@@ -97,8 +116,18 @@ class main_listener implements EventSubscriberInterface
     public function validate_captchaplus($event)
     {
         $message_parser = $event['message_parser'];
-        $post_data = $event['post_data'];
-        $vc_response = $this->captchaplus_service->validate($this->captcha, $message_parser->message, $post_data['post_subject'], $post_data['username']);
+        if (isset($event['post_data']))
+        {
+            $post_data = $event['post_data'];
+            $subject = $post_data['post_subject'];
+            $username = $post_data['username'];
+        }
+        else
+        {
+            $subject = $event['subject'];
+            $username = $this->captchaplus_service->current_username();
+        }
+        $vc_response = $this->captchaplus_service->validate($this->captcha, $message_parser->message, $subject, $username);
         if (!empty($vc_response))
         {
             $error = $event['error'];
@@ -118,6 +147,21 @@ class main_listener implements EventSubscriberInterface
     }
 
     /**
+     * Checks if the CAPTCHA needs a reset after submitting a PM
+     *
+     * @param \phpbb\event\data $event Event object
+     */
+    public function after_submit_check_pm($event)
+    {
+        $submit = $event['submit'];
+        $error = $event['error'];
+        if (!count($error) && $submit)
+        {
+            $this->captchaplus_service->reset($this->captcha);
+        }
+    }
+
+    /**
      * Add the CAPTCHA template
      *
      * @param \phpbb\event\data $event Event object
@@ -130,6 +174,22 @@ class main_listener implements EventSubscriberInterface
         {
             $event['s_hidden_fields'] = $s_hidden_fields;
             $event['page_data'] = $page_data;
+        }
+    }
+
+    /**
+     * Add the CAPTCHA template to PMs
+     *
+     * @param \phpbb\event\data $event Event object
+     */
+    public function add_captchaplus_pm($event)
+    {
+        $s_hidden_fields = '';
+        $template_ary = $event['template_ary'];
+        if ($this->captchaplus_service->add_captcha_template($this->captcha, $s_hidden_fields, $template_ary))
+        {
+            $template_ary['S_HIDDEN_FIELDS_PM'] = $s_hidden_fields;
+            $event['template_ary'] = $template_ary;
         }
     }
 }

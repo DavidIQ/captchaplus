@@ -1,10 +1,14 @@
 # CAPTCHA+
 
+Through the use of permissions, you can require CAPTCHA for:
+* Posting new topics or replies to existing topics
+* Sending PMs
+
 ## Installation
 
 Copy the extension to phpBB/ext/davidiq/captchaplus
 
-Go to "ACP" > "Customise" > "Extensions" and enable the "CAPTCHA 4 post" extension.
+Go to "ACP" > "Customise" > "Extensions" and enable the "CAPTCHA+" extension.
 
 ## Tests and Continuous Integration
 

@@ -27,6 +27,7 @@ class install_permissions extends \phpbb\db\migration\migration
         return [
             // Add new permissions
             ['permission.add', ['f_nopostcaptcha', false, 'f_noapprove']], // Copy settings from "Can post without approval"
+            ['permission.add', ['u_nopmcaptcha', true, 'u_masspm']], // Copy settings from "Can send private messages"
         ];
     }
 
@@ -38,7 +39,7 @@ class install_permissions extends \phpbb\db\migration\migration
     public function revert_data()
     {
         return [
-            ['permission.remove', ['f_nopostcaptcha']]
+            ['permission.remove', ['f_nopostcaptcha', 'un_nopmcaptcha']]
         ];
     }
 }

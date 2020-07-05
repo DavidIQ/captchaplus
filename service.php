@@ -46,13 +46,12 @@ class service
     /**
      * Initializes CAPTCHA for use when needed
      *
-     * @param integer $forum_id The forum ID to use for auth check
+     * @param bool $can_do_without_captcha Indicates if can do action without CAPTCHA
      * @return \phpbb\captcha\plugins\captcha_abstract|object|null
      */
-    public function init(int $forum_id)
+    public function init(bool $can_do_without_captcha)
     {
-        $can_post_without_captcha = $this->auth->acl_get('f_nopostcaptcha', $forum_id);
-        if (!$can_post_without_captcha && !empty($this->config['captcha_plugin']))
+        if (!$can_do_without_captcha && !empty($this->config['captcha_plugin']))
         {
             $captcha = $this->captcha_factory->get_instance($this->config['captcha_plugin']);
             $captcha->init(CONFIRM_POST);
@@ -130,5 +129,36 @@ class service
             return true;
         }
         return false;
+    }
+
+    /**
+     * Determines if the user can post without CAPTCHA
+     *
+     * @param int $forum_id The forum ID
+     * @return bool|mixed
+     */
+    public function can_post_without_captcha(int $forum_id)
+    {
+        return $this->auth->acl_get('f_nopostcaptcha', $forum_id);
+    }
+
+    /**
+     * Determines if a user can PM without having to solve a CAPTCHA
+     *
+     * @return bool|mixed
+     */
+    public function can_pm_without_captcha()
+    {
+        return $this->auth->acl_get('u_nopmcaptcha');
+    }
+
+    /**
+     * Gets the current user's username
+     *
+     * @return string
+     */
+    public function current_username()
+    {
+        return $this->user->data['username'];
     }
 }

@@ -36,4 +36,5 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, [
 	'ACL_F_NOPOSTCAPTCHA'	=> 'Can post without CAPTCHA',
+    'ACL_U_NOPMCAPTCHA'     => 'Can send private messages without CAPTCHA',
 ]);
