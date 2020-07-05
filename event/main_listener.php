@@ -81,7 +81,7 @@ class main_listener implements EventSubscriberInterface
     {
         $forum_id = (int)$event['forum_id'];
         $can_post_without_captcha = $this->auth->acl_get('f_nocaptcha4post', $forum_id);
-        if (!$can_post_without_captcha && isset($this->config['captcha_plugin']))
+        if (!$can_post_without_captcha && !empty($this->config['captcha_plugin']))
         {
             $this->captcha = $this->captcha_factory->get_instance($this->config['captcha_plugin']);
             $this->captcha->init(CONFIRM_POST);

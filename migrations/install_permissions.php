@@ -26,7 +26,7 @@ class install_permissions extends \phpbb\db\migration\migration
     {
         return [
             // Add new permissions
-            ['permission.add', ['f_nocaptcha4post', true, 'f_noapprove']], // Copy settings from "Can post without approval"
+            ['permission.add', ['f_nocaptcha4post', false, 'f_noapprove']], // Copy settings from "Can post without approval"
         ];
     }
 
