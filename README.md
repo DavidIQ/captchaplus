@@ -2,7 +2,11 @@
 
 Through the use of permissions, you can require CAPTCHA for:
 * Posting new topics or replies to existing topics
+  * The forum permission is: _Can post without CAPTCHA_
 * Sending PMs
+  * The user permission is: _Can send private messages without CAPTCHA_
+
+Setting these for a user or group to **Never** will require them to fill out the CAPTCHA for said action.
 
 ## Installation
 
