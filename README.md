@@ -10,6 +10,8 @@ Setting these for a user or group to **Never** will require them to fill out the
 
 ## Installation
 
+_phpBB version 3.3.x and higher required_
+
 Copy the extension to phpBB/ext/davidiq/captchaplus
 
 Go to "ACP" > "Customise" > "Extensions" and enable the "CAPTCHA+" extension.
