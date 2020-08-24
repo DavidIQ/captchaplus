@@ -30,16 +30,4 @@ class install_permissions extends \phpbb\db\migration\migration
             ['permission.add', ['u_nopmcaptcha', true, 'u_masspm']], // Copy settings from "Can send private messages"
         ];
     }
-
-    /**
-     * Remove the above permission from the database on extension removal.
-     *
-     * @return array Array of data removal instructions
-     */
-    public function revert_data()
-    {
-        return [
-            ['permission.remove', ['f_nopostcaptcha', 'un_nopmcaptcha']]
-        ];
-    }
 }
