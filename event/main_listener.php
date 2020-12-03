@@ -1,7 +1,7 @@
 <?php
 /**
  *
- * CAPTCHA 4 post. An extension for the phpBB Forum Software package.
+ * CAPTCHA+. An extension for the phpBB Forum Software package.
  *
  * @copyright (c) 2020, David Colón, https://www.davidiq.com/
  * @license GNU General Public License, version 2 (GPL-2.0)
@@ -17,7 +17,7 @@ namespace davidiq\captchaplus\event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * CAPTCHA 4 post Event listener.
+ * CAPTCHA+ Event listener.
  */
 class main_listener implements EventSubscriberInterface
 {
