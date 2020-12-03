@@ -153,6 +153,16 @@ class service
     }
 
     /**
+     * Determines if a user can contact admin without having to solve a CAPTCHA
+     *
+     * @return bool|mixed
+     */
+    public function can_contact_admin_without_captcha()
+    {
+        return $this->auth->acl_get('u_nocontactcaptcha');
+    }
+
+    /**
      * Gets the current user's username
      *
      * @return string

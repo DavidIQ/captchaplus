@@ -5,10 +5,10 @@ Through the use of permissions, you can require CAPTCHA for:
   * The forum permission is: _Can post without CAPTCHA_
 * Sending PMs
   * The user permission is: _Can send private messages without CAPTCHA_
+* Contact Admin
+  * The user permission is: _Can contact admin without CAPTCHA_
 
 Setting these for a user or group to **Never** will require them to fill out the CAPTCHA for said action.
-
-CAPTCHA is always shown on the contact admin form.
 
 ## Installation
 

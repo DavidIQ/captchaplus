@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Adds CAPTCHA to more areas.",
     "homepage": "https://github.com/DavidIQ/captchaplus",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "time": "2020-07-04",
     "license": "GPL-2.0-only",
     "authors": [

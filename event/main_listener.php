@@ -70,6 +70,7 @@ class main_listener implements EventSubscriberInterface
         $permissions = $event['permissions'];
         $permissions['f_nopostcaptcha'] = ['lang' => 'ACL_F_NOPOSTCAPTCHA', 'cat' => 'post'];
         $permissions['u_nopmcaptcha'] = ['lang' => 'ACL_U_NOPMCAPTCHA', 'cat' => 'pm'];
+        $permissions['u_nocontactcaptcha'] = ['lang' => 'ACL_U_NOCONTACTCAPTCHA', 'cat' => 'misc'];
         $event['permissions'] = $permissions;
     }
 
@@ -208,7 +209,8 @@ class main_listener implements EventSubscriberInterface
     {
         if ($this->captchaplus_service->on_contactadmin_form() && !isset($this->captcha))
         {
-            $this->captcha = $this->captchaplus_service->init(false);
+            $can_contact_admin_without_captcha = $this->captchaplus_service->can_contact_admin_without_captcha();
+            $this->captcha = $this->captchaplus_service->init($can_contact_admin_without_captcha);
             $s_hidden_fields = '';
             $template_ary = [];
             if ($this->captchaplus_service->add_captcha_template($this->captcha, $s_hidden_fields, $template_ary))

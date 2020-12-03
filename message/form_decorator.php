@@ -41,6 +41,6 @@ class form_decorator extends admin_form
      */
     public function get_template_file()
     {
-        return '@davidiq_captchaplus/memberlist_email.html';
+        return '@davidiq_captchaplus/memberlist_contact_admin.html';
     }
 }
