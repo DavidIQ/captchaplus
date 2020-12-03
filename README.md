@@ -8,6 +8,8 @@ Through the use of permissions, you can require CAPTCHA for:
 
 Setting these for a user or group to **Never** will require them to fill out the CAPTCHA for said action.
 
+CAPTCHA is always shown on the contact admin form.
+
 ## Installation
 
 _phpBB version 3.3.x and higher required_

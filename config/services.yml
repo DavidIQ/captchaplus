@@ -11,5 +11,18 @@ services:
         class: davidiq\captchaplus\event\main_listener
         arguments:
             - '@davidiq.captchaplus.service'
+            - '@template'
         tags:
             - { name: event.listener }
+
+    message.form.admin:
+        class: davidiq\captchaplus\message\form_decorator
+        arguments:
+            - '@auth'
+            - '@config'
+            - '@config_text'
+            - '@dbal.conn'
+            - '@user'
+            - '@dispatcher'
+            - '%core.root_path%'
+            - '%core.php_ext%'

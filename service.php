@@ -161,4 +161,15 @@ class service
     {
         return $this->user->data['username'];
     }
+
+    /**
+     * Determines if user is on contactadmin form
+     *
+     * @return bool
+     */
+    public function on_contactadmin_form()
+    {
+        return strpos($this->user->page['query_string'], 'mode=contactadmin') !== false &&
+                strpos($this->user->page['page_name'], 'memberlist') !== false;
+    }
 }

@@ -34,6 +34,8 @@ class main_listener implements EventSubscriberInterface
             'core.ucp_pm_compose_modify_parse_after' => 'after_submit_check_pm',
             'core.posting_modify_template_vars' => 'add_captchaplus',
             'core.ucp_pm_compose_template' => 'add_captchaplus_pm',
+            'core.user_setup_after' => 'add_captchaplus_contactadmin',
+            'core.message_admin_form_submit_before' => 'validate_captchaplus'
         ];
     }
 
@@ -43,14 +45,19 @@ class main_listener implements EventSubscriberInterface
     /** @var \phpbb\captcha\plugins\captcha_abstract */
     protected $captcha;
 
+    /** @var \phpbb\template\template */
+    protected $template;
+
     /**
      * Constructor
      *
      * @param \davidiq\captchaplus\service $service CAPTCHA+ service
+     * @param \phpbb\template\template $template Template object
      */
-    public function __construct(\davidiq\captchaplus\service $service)
+    public function __construct(\davidiq\captchaplus\service $service, \phpbb\template\template $template)
     {
         $this->captchaplus_service = $service;
+        $this->template = $template;
     }
 
     /**
@@ -115,7 +122,7 @@ class main_listener implements EventSubscriberInterface
      */
     public function validate_captchaplus($event)
     {
-        $message_parser = $event['message_parser'];
+        $message = isset($event['message_parser']) ? $event['message_parser']->message : $event['body'];
         if (isset($event['post_data']))
         {
             $post_data = $event['post_data'];
@@ -127,12 +134,13 @@ class main_listener implements EventSubscriberInterface
             $subject = $event['subject'];
             $username = $this->captchaplus_service->current_username();
         }
-        $vc_response = $this->captchaplus_service->validate($this->captcha, $message_parser->message, $subject, $username);
+        $vc_response = $this->captchaplus_service->validate($this->captcha, $message, $subject, $username);
         if (!empty($vc_response))
         {
-            $error = $event['error'];
+            $error_key = isset($event['error']) ? 'error' : 'errors';
+            $error = $event[$error_key];
             $error[] = $vc_response;
-            $event['error'] = $error;
+            $event[$error_key] = $error;
         }
     }
 
@@ -190,6 +198,24 @@ class main_listener implements EventSubscriberInterface
         {
             $template_ary['S_HIDDEN_FIELDS_PM'] = $s_hidden_fields;
             $event['template_ary'] = $template_ary;
+        }
+    }
+
+    /**
+     * Add the CAPTCHA template to the contact admin form
+     */
+    public function add_captchaplus_contactadmin()
+    {
+        if ($this->captchaplus_service->on_contactadmin_form() && !isset($this->captcha))
+        {
+            $this->captcha = $this->captchaplus_service->init(false);
+            $s_hidden_fields = '';
+            $template_ary = [];
+            if ($this->captchaplus_service->add_captcha_template($this->captcha, $s_hidden_fields, $template_ary))
+            {
+                $template_ary['S_HIDDEN_FIELDS'] = $s_hidden_fields;
+                $this->template->assign_vars($template_ary);
+            }
         }
     }
 }
