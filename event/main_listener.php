@@ -32,7 +32,7 @@ class main_listener implements EventSubscriberInterface
             'core.ucp_pm_compose_modify_parse_before' => 'validate_captchaplus',
             'core.posting_modify_submit_post_after' => 'after_submit_check',
             'core.ucp_pm_compose_modify_parse_after' => 'after_submit_check_pm',
-            'core.posting_modify_template_vars' => 'add_captchaplus',
+            'core.posting_modify_template_vars' => 'add_captchaplus_posting',
             'core.ucp_pm_compose_template' => 'add_captchaplus_pm',
             'core.user_setup_after' => 'add_captchaplus_contactadmin',
             'core.message_admin_form_submit_before' => 'validate_captchaplus'
@@ -47,6 +47,12 @@ class main_listener implements EventSubscriberInterface
 
     /** @var \phpbb\template\template */
     protected $template;
+
+    /** @var bool */
+    protected $reset_captcha = false;
+
+    /** @var bool */
+    protected $skip_validation = false;
 
     /**
      * Constructor
@@ -114,6 +120,8 @@ class main_listener implements EventSubscriberInterface
     {
         $can_pm_without_captcha = $this->captchaplus_service->can_pm_without_captcha();
         $this->captcha = $this->captchaplus_service->init($can_pm_without_captcha);
+        $this->reset_captcha = $event['preview'];
+        $this->skip_validation = !$event['preview'] && !$event['submit']; // User is likely changing recipients
     }
 
     /**
@@ -123,6 +131,11 @@ class main_listener implements EventSubscriberInterface
      */
     public function validate_captchaplus($event)
     {
+        if ($this->skip_validation)
+        {
+            return;
+        }
+
         $message = isset($event['message_parser']) ? $event['message_parser']->message : $event['body'];
         if (isset($event['post_data']))
         {
@@ -175,8 +188,13 @@ class main_listener implements EventSubscriberInterface
      *
      * @param \phpbb\event\data $event Event object
      */
-    public function add_captchaplus($event)
+    public function add_captchaplus_posting($event)
     {
+        if ($event['preview'])
+        {
+            $this->captchaplus_service->reset($this->captcha);
+        }
+        
         $s_hidden_fields = $event['s_hidden_fields'];
         $page_data = $event['page_data'];
         if ($this->captchaplus_service->add_captcha_template($this->captcha, $s_hidden_fields, $page_data))
@@ -193,8 +211,13 @@ class main_listener implements EventSubscriberInterface
      */
     public function add_captchaplus_pm($event)
     {
-        $s_hidden_fields = '';
+        if ($this->reset_captcha)
+        {
+            $this->captchaplus_service->reset($this->captcha);
+        }
+
         $template_ary = $event['template_ary'];
+        $s_hidden_fields = $template_ary['S_HIDDEN_FIELDS'];
         if ($this->captchaplus_service->add_captcha_template($this->captcha, $s_hidden_fields, $template_ary))
         {
             $template_ary['S_HIDDEN_FIELDS_PM'] = $s_hidden_fields;
